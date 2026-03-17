@@ -185,10 +185,22 @@
 
             <!-- Mobile Menu Icon -->
             <div class="lg:hidden flex justify-end items-center ml-auto md:ml-4">
-                <button class="text-white text-2xl">
+                <button id="mobile-menu-btn" class="text-white text-2xl">
                     <i class="ph ph-list"></i>
                 </button>
             </div>
+            <div id="mobile-menu" class="hidden lg:hidden absolute top-[76px] left-0 w-full bg-darker/95 backdrop-blur-md border-b border-white/10 flex-col items-center py-6 space-y-5 shadow-2xl transition-all duration-300">
+    <a href="#mission" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Kiệt tác</a>
+    <a href="#about" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Vị thế</a>
+    <a href="#amenities" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Đặc quyền</a>
+    <a href="#sales-policy" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Chính sách</a>
+    <a href="#legal" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Pháp lý</a>
+    <a href="#timeline" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Tiến độ</a>
+    <a href="http://127.0.0.1:5500/booking.html" class="mobile-link text-sm font-bold uppercase text-zinc-300 hover:text-gold transition-colors tracking-widest">Booking</a>
+    <a href="#contact" class="mobile-link px-8 py-3 mt-4 bg-gold text-dark text-xs font-semibold hover:bg-goldHover transition-all duration-300 rounded uppercase tracking-wider shadow-md shadow-gold/20">
+        Tư vấn riêng
+    </a>
+</div>
         </div>
     </header>
 
@@ -1323,6 +1335,36 @@
                 }
             });
         });
+        // Mobile Menu Toggle Script
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const menuIcon = mobileMenuBtn.querySelector('i');
+
+mobileMenuBtn.addEventListener('click', () => {
+    // Bật/tắt menu
+    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.toggle('flex');
+    
+    // Đổi icon từ list sang X (nếu đang mở)
+    if (mobileMenu.classList.contains('flex')) {
+        menuIcon.classList.remove('ph-list');
+        menuIcon.classList.add('ph-x');
+    } else {
+        menuIcon.classList.remove('ph-x');
+        menuIcon.classList.add('ph-list');
+    }
+});
+
+// Tự động đóng menu khi click vào một link bất kỳ
+const mobileLinks = document.querySelectorAll('.mobile-link');
+mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('flex');
+        menuIcon.classList.remove('ph-x');
+        menuIcon.classList.add('ph-list');
+    });
+});
     </script>
     
 </body>
