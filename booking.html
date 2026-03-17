@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking & Đấu Giá | The Legend City Da Nang</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#C5A059',
+                        goldHover: '#dcb872',
+                        dark: '#0a0a0a',
+                        darker: '#050505',
+                        charcoal: '#1a1a1a',
+                        /* Trạng thái căn hộ */
+                        stUnseen: '#52525b', /* Zinc 600 - Chưa được xem */
+                        stViewing: '#3b82f6', /* Blue 500 - Đang được xem */
+                        stDepositing: '#f97316', /* Orange 500 - Đang đặt cọc */
+                        stDeposited: '#C5A059', /* Gold - Đã đặt cọc */
+                        stSold: '#7f1d1d', /* Red 900 - Đã bán */
+                        stResale: '#8b5cf6', /* Purple 500 - Chuyển nhượng */
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #C5A059, #F3E5AB, #C5A059);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 10px; }
+
+        /* Form styling */
+        .input-bespoke {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            color: white;
+            padding: 12px 0;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .input-bespoke:focus {
+            outline: none;
+            border-bottom: 1px solid #C5A059;
+        }
+        .input-bespoke::placeholder { color: #666; font-weight: 300; }
+        
+        select.input-bespoke option {
+            background-color: #0a0a0a;
+            color: white;
+        }
+
+        /* Interactive Floor Plan Grid */
+        .floor-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" fill="none" stroke="%23ffffff" stroke-width="0.5" stroke-opacity="0.05"/></svg>');
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .unit-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .unit-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+            border-color: #C5A059;
+        }
+
+        .unit-cell.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+        .unit-cell.empty:hover { transform: none; box-shadow: none; }
+
+        /* Modal Transitions */
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .modal.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Radio Button Custom */
+        .radio-custom input:checked + div {
+            border-color: #C5A059;
+            background-color: rgba(197, 160, 89, 0.1);
+        }
+        .radio-custom input:checked + div span {
+            color: #C5A059;
+        }
+
+        /* Auction Card pulse */
+        .auction-pulse {
+            animation: borderPulse 2s infinite;
+        }
+        @keyframes borderPulse {
+            0% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(197, 160, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-gold selection:text-dark">
+
+    <!-- HEADER (Minimal for Booking Page) -->
+    <header class="fixed w-full top-0 z-50 bg-darker/95 backdrop-blur-md border-b border-white/10 py-4">
+        <div class="container mx-auto px-4 lg:px-8 flex justify-between items-center">
+            <a href="index.html" class="flex items-center text-white hover:text-gold transition-colors text-sm font-medium tracking-widest">
+                <i class="ph ph-arrow-left mr-2 text-white"></i> Home
+            </a>
+            <div class="font-serif text-xl tracking-wider text-gradient-gold">HỆ THỐNG BOOKING & ĐẤU GIÁ</div>
+            <div class="text-sm text-white">Rox Signature</div>
+        </div>
+    </header>
+
+    <!-- SECTION 1: PROJECT OVERVIEW -->
+    <section class="pt-0 pb-12 bg-dark relative border-b border-white/5">
+        <!-- Hero Banner Thêm Mới -->
+        <div class="w-full h-[50vh] md:h-[70vh] relative mb-16 group overflow-hidden">
+            <img src="./images/ban-do-vi-tri.jpg" alt="Hero Banner" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/40 to-transparent pointer-events-none"></div>
+        </div>
+
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="text-center max-w-4xl mx-auto mb-12">
+                <h1 class="font-serif text-4xl md:text-5xl mb-6">Lựa chọn <span class="italic text-zinc-400">Kiệt tác</span></h1>
+                <p class="font-sans text-zinc-300 font-light text-sm md:text-base leading-relaxed">
+                    Quy mô 2 tòa tháp kiêu hãnh (Tháp căn hộ 29 tầng & Tháp khách sạn 25 tầng) với mật độ xây dựng chỉ 35%. 
+                    Hành lang thông thoáng, ban công kính tràn viền cùng nội thất tiêu chuẩn resort 5 sao. Tận hưởng 3 tầng đế trung tâm thương mại và hồ bơi vô cực trên không.
+                </p>
+            </div>
+
+            <!-- Apartment Types Info (Đã thêm hình ảnh) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center border-t border-b border-white/5 py-10">
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden rounded mb-4 border border-white/5 relative">
+                        <img src="./images/can1.jpg" class="w-full h-80 object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Căn hộ 1PN">
+                        <div class="absolute inset-0 bg-darker/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">1PN / 1PN+</h3>
+                    <p class="text-sm text-zinc-300 font-medium tracking-wider">40 – 63m²</p>
+                    <p class="text-sm md:text-base text-zinc-400 mt-3 font-light leading-relaxed px-2">Tối ưu công năng, phù hợp người độc thân/vợ chồng trẻ.</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden rounded mb-4 border border-white/5 relative">
+                        <img src="./images/can2.jpg" class="w-full h-80 object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Căn hộ 2PN">
+                        <div class="absolute inset-0 bg-darker/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">2PN</h3>
+                    <p class="text-sm text-zinc-300 font-medium tracking-wider">73 – 84m²</p>
+                    <p class="text-sm md:text-base text-zinc-400 mt-3 font-light leading-relaxed px-2">Không gian sinh hoạt chung rộng rãi, gắn kết gia đình.</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden rounded mb-4 border border-white/5 relative">
+                        <img src="./images/can3.jpg" class="w-full h-80 object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Căn hộ 3PN">
+                        <div class="absolute inset-0 bg-darker/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">3PN</h3>
+                    <p class="text-sm text-zinc-300 font-medium tracking-wider">85 – 115m²</p>
+                    <p class="text-sm md:text-base text-zinc-400 mt-3 font-light leading-relaxed px-2">Góc view thoáng đạt, sang trọng, đẳng cấp.</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden rounded mb-4 border border-white/5 relative">
+                        <img src="./images/can4.jpg" class="w-full h-80 object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Penthouse">
+                        <div class="absolute inset-0 bg-darker/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">Penthouse/Duplex</h3>
+                    <p class="text-sm text-zinc-300 font-medium tracking-wider">256 – 415m²</p>
+                    <p class="text-sm md:text-base text-zinc-400 mt-3 font-light leading-relaxed px-2">Tầng cao nhất, thông tầng, view toàn cảnh thành phố.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1.5: AMENITIES (HỆ THỐNG TIỆN ÍCH TỪ FILE WORD) -->
+    <section class="py-16 bg-dark relative border-b border-white/5">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <p class="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">The Legend Da Nang</p>
+                <h2 class="font-serif text-3xl md:text-5xl mb-6">Hệ Thống Tiện Ích <br><span class="italic text-zinc-400">Nơi Mỗi Ngày Là Một Kỳ Nghỉ 5 Sao</span></h2>
+                <p class="font-sans text-zinc-300 font-light leading-relaxed">
+                    Vượt xa khái niệm về một nơi ở thông thường, The Legend Da Nang kiến tạo một hệ sinh thái tiện ích đặc quyền, được ví như một bản giao hưởng của những trải nghiệm sống đỉnh cao. Được phát triển bởi ROX Signature và bảo chứng chất lượng vận hành bởi Accor Hotels, mỗi tiện ích tại đây không chỉ là một cơ sở vật chất, mà là một không gian được “may đo” tinh xảo để phục vụ phong cách sống của cộng đồng cư dân tinh hoa.
+                </p>
+                <p class="font-sans text-gold font-medium mt-4 italic">Đây không chỉ là những tiện nghi, đây là tuyên ngôn về một cuộc sống đầy kiêu hãnh và khác biệt.</p>
+            </div>
+
+            <!-- Part I: Đa Tầng Độc Đáo -->
+            <div class="mb-16">
+                <h3 class="font-serif text-2xl text-white mb-8 border-l-2 border-gold pl-4">I. Tiện Ích Đa Tầng Độc Đáo – Hành Trình Từ Mặt Đất Lên Bầu Trời</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
+                    <div>
+                        <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">Không gian mặt đất tráng lệ</h3>
+                        <p class="text-zinc-400 font-light text-sm mb-4 leading-relaxed">Ngay từ những bước chân đầu tiên, The Legend Da Nang chào đón cư dân và khách quý bằng một không gian tách biệt khỏi sự ồn ào của phố thị:</p>
+                        <ul class="space-y-3 text-sm font-light text-zinc-300">
+                            <li><strong class="text-white font-medium">•  Không gian cảnh quan 1.350m²:</strong> Được thiết kế như một khu vườn nghệ thuật với đảo cảnh quan, đài nước, và những mảng xanh được chăm chút tỉ mỉ.</li>
+                            <li><strong class="text-white font-medium">•  Sảnh Lobby Sang Trọng:</strong> Khu vực sảnh cư dân và sảnh khách được thiết kế riêng biệt, với nội thất cao cấp theo tiêu chuẩn khách sạn 5 sao.</li>
+                            <li><strong class="text-white font-medium">•  Khu Drop-off & Lối đi riêng:</strong> Điểm đón trả khách sang trọng cùng lối vào dành riêng cho đội ngũ phục vụ.</li>
+                            <li><strong class="text-white font-medium">•  Café ngoài trời:</strong> Không gian thư giãn lý tưởng để gặp gỡ bạn bè và tận hưởng không khí trong lành.</li>
+                        </ul>
+                    </div>
+                    <div class="overflow-hidden border border-white/10 rounded group">
+                        <img src="./images/tienich1.png" alt="Sảnh Lobby" class="w-full h-[300px] object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12 flex-col-reverse lg:flex-row-reverse">
+                    <div>
+                        <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">Trái tim giải trí khối đế</h3>
+                        <p class="text-zinc-400 font-light text-sm mb-4 leading-relaxed">Nơi cư dân có thể đắm mình trong làn nước mát và ngắm nhìn nhịp sống sôi động của thành phố:</p>
+                        <ul class="space-y-3 text-sm font-light text-zinc-300">
+                            <li><strong class="text-white font-medium">•  Bể bơi vô cực 50m:</strong> Điểm nhấn đắt giá, hồ bơi chuẩn Olympic dài 50m với tầm nhìn panorama tuyệt đẹp.</li>
+                            <li><strong class="text-white font-medium">•  Hồ bơi trẻ em & Khu vui chơi:</strong> Không gian an toàn và vui nhộn được thiết kế dành riêng cho các cư dân nhí.</li>
+                            <li><strong class="text-white font-medium">•  Khu nước nông & Chòi nghỉ Cabana:</strong> Nơi lý tưởng để nghỉ ngơi, đọc sách và tận hưởng bình yên.</li>
+                            <li><strong class="text-white font-medium">•  Vườn tiệc (Party Garden):</strong> Không gian tổ chức những buổi tiệc ngoài trời thân mật và sang trọng.</li>
+                        </ul>
+                    </div>
+                    <div class="overflow-hidden border border-white/10 rounded group">
+                        <img src="./images/tienich2.png" alt="Khu Party Lounge" class="w-full h-[300px] object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="font-serif text-2xl text-gold mb-2 transition-colors">Thế giới tiện ích trên không (Tầng thượng)</h3>
+                        <p class="text-zinc-400 font-light text-sm mb-4 leading-relaxed">Mang đến những trải nghiệm độc nhất vô nhị với tầm nhìn 360 độ ôm trọn sông, biển và thành phố:</p>
+                        <ul class="space-y-3 text-sm font-light text-zinc-300">
+                            <li><strong class="text-white font-medium">•  Đài quan sát & Sky Garden:</strong> Ngắm trọn vẹn vẻ đẹp của Đà Nẵng từ trên cao, đặc biệt là khung cảnh biển Mỹ Khê và Cầu Rồng lung linh về đêm.</li>
+                            <li><strong class="text-white font-medium">•  Hồ sục Jacuzzi:</strong> Thư giãn cơ thể và tâm trí trong làn nước ấm áp giữa không gian thoáng đãng.</li>
+                            <li><strong class="text-white font-medium">•  Vườn BBQ & Khu vui chơi trẻ em:</strong> Địa điểm hoàn hảo cho những buổi sum họp gia đình ấm cúng.</li>
+                            <li><strong class="text-white font-medium">•  Sân ngắm cảnh & Tập Yoga:</strong> Không gian lý tưởng để bắt đầu một ngày mới tràn đầy năng lượng.</li>
+                        </ul>
+                    </div>
+                    <div class="overflow-hidden border border-white/10 rounded group">
+                        <img src="./images/tienich3.png" alt="Tầm nhìn Cầu Rồng" class="w-full h-[300px] object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part II: Dịch vụ Bespoke -->
+            <div>
+                <h3 class="font-serif text-2xl text-white mb-8 border-l-2 border-gold pl-4">II. Dịch Vụ “Bespoke” – Nơi Mọi Đặc Quyền Được Cá Nhân Hóa</h3>
+                <p class="text-zinc-400 font-light text-sm mb-8 leading-relaxed max-w-3xl">Điều làm nên sự khác biệt của tiện ích The Legend Da Nang chính là các dịch vụ “may đo” (bespoke) chuẩn 5 sao quốc tế, nơi mọi nhu cầu của cư dân đều được lắng nghe và đáp ứng một cách hoàn hảo.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-darker border border-white/5 hover:border-gold/30 transition-colors group overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="./images/tien-ich-noi-khu.jpg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Concierge 24/7">
+                        </div>
+                        <div class="p-6">
+                            <h5 class="text-white font-medium mb-2 flex items-center"><i class="ph ph-bell-ringing text-gold mr-2 text-xl"></i> Dịch vụ Concierge 24/7</h5>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Đội ngũ chuyên nghiệp luôn sẵn sàng hỗ trợ từ đặt vé máy bay, nhà hàng, tour du lịch cho đến các yêu cầu cá nhân khác.</p>
+                        </div>
+                    </div>
+                    <div class="bg-darker border border-white/5 hover:border-gold/30 transition-colors group overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="./images/noi-that-phong-khach.jpg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Sảnh Lounge">
+                        </div>
+                        <div class="p-6">
+                            <h5 class="text-white font-medium mb-2 flex items-center"><i class="ph ph-martini text-gold mr-2 text-xl"></i> Sảnh Lounge Riêng Tư</h5>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Không gian sang trọng dành riêng cho các cuộc gặp gỡ đối tác hoặc những buổi tiệc thân mật, đảm bảo sự riêng tư.</p>
+                        </div>
+                    </div>
+                    <div class="bg-darker border border-white/5 hover:border-gold/30 transition-colors group overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="./images/golf.avif" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Golf điện tử">
+                        </div>
+                        <div class="p-6">
+                            <h5 class="text-white font-medium mb-2 flex items-center"><i class="ph ph-golf text-gold mr-2 text-xl"></i> Golf điện tử (Simulator)</h5>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Thỏa mãn đam mê của các golfer ngay tại nơi ở với công nghệ giả lập hiện đại bậc nhất.</p>
+                        </div>
+                    </div>
+                    <div class="bg-darker border border-white/5 hover:border-gold/30 transition-colors group overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="./images/camera.avif" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="An ninh">
+                        </div>
+                        <div class="p-6">
+                            <h5 class="text-white font-medium mb-2 flex items-center"><i class="ph ph-shield-check text-gold mr-2 text-xl"></i> Hệ thống an ninh đa lớp</h5>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Camera giám sát, thẻ từ thang máy và bảo vệ túc trực, đảm bảo an toàn tuyệt đối cho cư dân 24/7.</p>
+                        </div>
+                    </div>
+                    <div class="bg-darker border border-white/5 hover:border-gold/30 transition-colors md:col-span-2 lg:col-span-2 group overflow-hidden">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="./images/spa.avif" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Hệ thống nhà hàng Spa">
+                        </div>
+                        <div class="p-6">
+                            <h5 class="text-white font-medium mb-2 flex items-center"><i class="ph ph-barbell text-gold mr-2 text-xl"></i> Hệ thống nhà hàng, spa, gym Accor</h5>
+                            <p class="text-xs text-zinc-500 leading-relaxed">Chuỗi tiện ích chăm sóc sức khỏe và ẩm thực đỉnh cao, vận hành theo tiêu chuẩn khắt khe của đơn vị danh tiếng Accor Hotels.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: INTERACTIVE FLOOR PLAN -->
+    <section class="py-16 bg-darker relative border-b border-white/5">
+        <div class="container mx-auto px-4 lg:px-8">
+            
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <p class="font-sans text-xs tracking-[0.2em] text-gold uppercase mb-4">Trải nghiệm cá nhân hóa</p>
+                <h2 class="font-serif text-3xl md:text-5xl mb-6">Hệ Thống Booking và Đấu Giá <br><span class="italic text-zinc-400">Lựa chọn di sản cho thế hệ sau</span></h2>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Left Sidebar: Controls & Legend -->
+                <div class="w-full lg:w-1/4">
+                    <div class="sticky top-24 bg-dark border border-white/5 p-6 rounded-lg">
+                        <h3 class="font-serif text-2xl mb-6 border-b border-gold/30 pb-4">Bộ lọc & Trạng thái</h3>
+                        
+                        <!-- Floor Selection -->
+                        <div class="mb-8">
+                            <label class="block text-xs text-gold uppercase tracking-widest mb-3">Chọn tầng</label>
+                            <select id="floorSelect" class="w-full bg-darker border border-white/10 text-white p-3 rounded focus:border-gold outline-none transition-colors">
+                                <option value="28">Tầng 28 - Penthouse</option>
+                                <option value="25">Tầng 25 - Căn hộ VIP</option>
+                                <option value="15" selected>Tầng 15 - Căn hộ Tiêu chuẩn</option>
+                                <option value="10">Tầng 10 - Căn hộ Tiêu chuẩn</option>
+                                <option value="05">Tầng 05 - Căn hộ Tiêu chuẩn</option>
+                            </select>
+                        </div>
+
+                        <!-- Legend -->
+                        <div>
+                            <label class="block text-xs text-gold uppercase tracking-widest mb-3">Bảng chú giải trạng thái</label>
+                            <ul class="space-y-3">
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stUnseen mr-3 border border-white/20"></span> Chưa được xem</li>
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stViewing mr-3 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span> Đang được xem</li>
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stDepositing mr-3"></span> Đang được đặt cọc</li>
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stDeposited mr-3 shadow-[0_0_8px_rgba(197,160,89,0.6)]"></span> Đã đặt cọc</li>
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stSold mr-3"></span> Đã bán</li>
+                                <li class="flex items-center text-sm font-light text-zinc-300"><span class="w-4 h-4 rounded bg-stResale mr-3"></span> Cần chuyển nhượng lại</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Area: The Grid -->
+                <div class="w-full lg:w-3/4">
+                    <div class="flex justify-between items-end mb-4">
+                        <h2 class="font-serif text-2xl text-white">Mặt bằng <span class="text-gold" id="currentFloorDisplay">Tầng 15</span></h2>
+                        <p class="text-xs text-zinc-400 italic"><i class="ph ph-info mr-1"></i> Bấm vào căn hộ để xem chi tiết và Booking</p>
+                    </div>
+                    
+                    <!-- Grid Container -->
+                    <div class="w-full pb-4 flex justify-center">
+                        <div class="floor-grid w-full max-w-2xl" id="floorGrid">
+                            <!-- JS sẽ render các ô căn hộ vào đây để tạo thành hình dọc -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: AUCTION SPECIAL UNITS -->
+    <section class="py-16 bg-dark border-t border-white/5 relative">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="text-center mb-12">
+                <i class="ph ph-gavel text-4xl text-gold mb-4"></i>
+                <h2 class="font-serif text-3xl md:text-4xl">Phiên Đấu Giá <span class="italic text-zinc-400">Đặc Quyền</span></h2>
+                <p class="font-sans text-zinc-400 font-light mt-4">3 tuyệt tác sở hữu tầm nhìn panorama đẹp nhất trên mỗi tầng được mở bán thông qua hình thức đấu giá công khai minh bạch.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="auctionContainer">
+                <!-- Auction Cards generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL 1: UNIT DETAIL & BOOKING FORM -->
+    <div id="bookingModal" class="modal fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="modal-content bg-darker border border-gold/30 w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-sm shadow-2xl relative flex flex-col md:flex-row">
+            
+            <!-- Nút Đóng -->
+            <button onclick="closeModal('bookingModal')" class="absolute top-4 right-4 text-zinc-400 hover:text-gold transition-colors z-10 bg-dark p-2 rounded-full border border-white/10">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+
+            <!-- Cột trái: Thông tin Layout Căn hộ -->
+            <div class="w-full md:w-5/12 bg-dark p-8 border-r border-white/5 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold via-yellow-200 to-gold"></div>
+                
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <p class="text-gold text-xs tracking-widest uppercase mb-1" id="modalFloor">Tầng 15</p>
+                        <h2 class="font-serif text-4xl text-white" id="modalUnitName">Căn L.08</h2>
+                    </div>
+                    <span id="modalStatusBadge" class="px-3 py-1 text-xs font-medium rounded border">Đang trống</span>
+                </div>
+
+                <div class="bg-black/50 p-4 rounded border border-white/5 mb-6">
+                    <img id="modalImage" src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Layout Căn Hộ" class="w-full h-48 object-cover rounded opacity-80 hover:opacity-100 transition-opacity mb-4">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-zinc-500 uppercase">Loại hình</p>
+                            <p class="text-white font-medium" id="modalType">3 Phòng Ngủ</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-zinc-500 uppercase">Diện tích</p>
+                            <p class="text-white font-medium" id="modalArea">114.1 m²</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-zinc-500 uppercase">Hướng view</p>
+                            <p class="text-white font-medium">Sông Hàn, Cầu Rồng</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-zinc-500 uppercase">Bàn giao</p>
+                            <p class="text-white font-medium">Hoàn thiện liền tường</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-sm font-light text-zinc-400 italic">
+                    * Layout chi tiết và bảng nguyên vật liệu sẽ được tư vấn viên cung cấp trực tiếp trong buổi hẹn.
+                </div>
+            </div>
+
+            <!-- Cột phải: Form Booking -->
+            <div class="w-full md:w-7/12 p-8">
+                <h3 class="font-serif text-2xl mb-6 flex items-center"><i class="ph ph-calendar-plus text-gold mr-3"></i> Đặt lịch tư vấn VIP</h3>
+                
+                <form id="bookingForm" onsubmit="handleBookingSubmit(event)">
+                    <input type="hidden" id="formUnitId">
+                    
+                    <!-- Lựa chọn Chuyên viên -->
+                    <div class="mb-8">
+                        <label class="block text-sm text-zinc-300 mb-3">Chuyên viên tư vấn <span class="text-gold">*</span></label>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="consultantList">
+                            <!-- Render by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Thời gian -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-xs text-zinc-500 uppercase mb-1">Ngày hẹn</label>
+                            <input type="date" required class="input-bespoke bg-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-500 uppercase mb-1">Giờ hẹn</label>
+                            <input type="time" required class="input-bespoke bg-transparent">
+                        </div>
+                    </div>
+
+                    <div class="h-px w-full bg-white/10 my-6"></div>
+
+                    <!-- Thông tin Khách hàng -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+                        <div class="sm:col-span-2">
+                            <input type="text" placeholder="Họ và tên *" required class="input-bespoke">
+                        </div>
+                        <div>
+                            <select required class="input-bespoke">
+                                <option value="" disabled selected>Giới tính *</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <input type="number" placeholder="Tuổi" min="18" max="100" class="input-bespoke">
+                        </div>
+                        <div>
+                            <input type="tel" placeholder="Số điện thoại *" required class="input-bespoke">
+                        </div>
+                        <div>
+                            <input type="email" placeholder="Email" class="input-bespoke">
+                        </div>
+                    </div>
+
+                    <!-- Mục đích & Tùy chọn -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <select required class="input-bespoke">
+                                <option value="" disabled selected>Mục đích mua căn hộ *</option>
+                                <option value="Để ở">An cư / Để ở</option>
+                                <option value="Đầu tư">Đầu tư sinh lời</option>
+                                <option value="Cho thuê">Khai thác cho thuê</option>
+                                <option value="Nghỉ dưỡng">Nghỉ dưỡng cuối tuần</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center pt-3">
+                            <label class="flex items-center cursor-pointer group">
+                                <div class="relative flex items-center justify-center w-5 h-5 mr-3 border border-zinc-500 rounded bg-transparent group-hover:border-gold transition-colors">
+                                    <input type="checkbox" class="peer opacity-0 absolute w-full h-full cursor-pointer" id="fengShuiCheck">
+                                    <i class="ph-bold ph-check text-gold opacity-0 peer-checked:opacity-100 absolute pointer-events-none text-xs"></i>
+                                </div>
+                                <span class="text-sm text-zinc-300 group-hover:text-white transition-colors">Tôi cần tư vấn thêm về Phong thủy</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-4 mt-8">
+                        <button type="button" onclick="closeModal('bookingModal')" class="px-6 py-3 border border-white/20 text-zinc-300 hover:bg-white/5 transition-colors text-sm uppercase tracking-widest">Hủy</button>
+                        <button type="submit" id="submitBtn" class="px-8 py-3 bg-gold text-dark hover:bg-goldHover transition-colors font-medium text-sm uppercase tracking-widest shadow-[0_0_15px_rgba(197,160,89,0.3)]">
+                            Xác nhận Đặt lịch
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: SUCCESS CONFIRMATION -->
+    <div id="successModal" class="modal fixed inset-0 z-[110] flex items-center justify-center bg-black/90 px-4">
+        <div class="modal-content bg-dark border border-gold/50 p-10 max-w-md w-full text-center rounded-sm relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 opacity-10">
+                <i class="ph-fill ph-seal-check text-[10rem] text-gold"></i>
+            </div>
+            
+            <i class="ph-fill ph-check-circle text-6xl text-gold mb-6 relative z-10 drop-shadow-[0_0_10px_rgba(197,160,89,0.5)]"></i>
+            
+            <h2 class="font-serif text-3xl text-white mb-2 relative z-10">Booking Thành Công</h2>
+            <p class="text-zinc-400 font-light text-sm mb-6 relative z-10">
+                Hệ thống đã ghi nhận lịch hẹn của Quý khách cho <strong class="text-white" id="successUnit">Căn hộ</strong>. 
+                Chuyên viên <strong class="text-gold" id="successConsultant">Tên Tư vấn</strong> sẽ liên hệ xác nhận trong ít phút.
+            </p>
+
+            <div class="bg-darker border border-white/5 p-4 text-left mb-8 relative z-10">
+                <p class="text-xs text-zinc-500 uppercase mb-2">Mã xác nhận hẹn</p>
+                <p class="text-xl font-mono text-gradient-gold tracking-widest" id="bookingCode">ROX-8899</p>
+            </div>
+
+            <button onclick="closeModal('successModal')" class="w-full py-3 bg-white/10 text-white hover:bg-gold hover:text-dark transition-colors text-sm uppercase tracking-widest relative z-10 font-medium border border-white/20 hover:border-gold">
+                Trở về Mặt bằng
+            </button>
+        </div>
+    </div>
+
+    <!-- Javascript Logic -->
+    <script>
+        // --- DATA MOCKUP ---
+        
+        // 10 Female Consultants
+        const consultants = [
+            { id: 'c1', name: 'Trần Vy', img: 'https://i.pravatar.cc/150?img=47' },
+            { id: 'c2', name: 'Lê Na', img: 'https://i.pravatar.cc/150?img=44' },
+            { id: 'c3', name: 'Mai Anh', img: 'https://i.pravatar.cc/150?img=32' },
+            { id: 'c4', name: 'Hoài Ngọc', img: 'https://i.pravatar.cc/150?img=36' },
+            { id: 'c5', name: 'Thu Hương', img: 'https://i.pravatar.cc/150?img=49' },
+            { id: 'c6', name: 'Bảo Trâm', img: 'https://i.pravatar.cc/150?img=10' },
+            { id: 'c7', name: 'Nhã Thy', img: 'https://i.pravatar.cc/150?img=20' },
+            { id: 'c8', name: 'Minh Hằng', img: 'https://i.pravatar.cc/150?img=24' },
+            { id: 'c9', name: 'Tú Uyên', img: 'https://i.pravatar.cc/150?img=28' },
+            { id: 'c10', name: 'Gia Linh', img: 'https://i.pravatar.cc/150?img=30' }
+        ];
+
+        // Status Dictionary
+        const statuses = {
+            'unseen': { label: 'Chưa xem', color: 'bg-stUnseen', text: 'text-zinc-400', border: 'border-white/20' },
+            'viewing': { label: 'Đang xem', color: 'bg-stViewing', text: 'text-white', border: 'border-blue-400', shadow: 'shadow-[0_0_10px_rgba(59,130,246,0.5)]' },
+            'depositing': { label: 'Đang cọc', color: 'bg-stDepositing', text: 'text-white', border: 'border-orange-400' },
+            'deposited': { label: 'Đã cọc', color: 'bg-stDeposited', text: 'text-dark font-medium', border: 'border-gold', shadow: 'shadow-[0_0_10px_rgba(197,160,89,0.5)]' },
+            'sold': { label: 'Đã bán', color: 'bg-stSold', text: 'text-red-200', border: 'border-red-900', disabled: true },
+            'resale': { label: 'Chuyển nhượng', color: 'bg-stResale', text: 'text-white', border: 'border-purple-400' }
+        };
+
+        // Generate Floor Grid Layout (Simulating a vertical building plan)
+        const gridMap = [
+            ['L.12', 'L.11', 'L.10', 'L.09', 'empty'],
+            ['L.12A', 'empty', 'empty', 'empty', 'L.08'],
+            ['empty', 'L.12B', 'L.15', 'empty', 'L.07'],
+            ['empty', 'empty', 'L.16', 'empty', 'L.06'],
+            ['I.02', 'I.01', 'L.17', 'empty', 'L.05'],
+            ['I.03', 'empty', 'L.18', 'empty', 'L.03A'],
+            ['I.03A', 'empty', 'empty', 'empty', 'L.03'],
+            ['I.05', 'empty', 'I.18', 'L.01', 'L.02'],
+            ['I.06', 'empty', 'I.17', 'empty', 'empty'],
+            ['I.07', 'empty', 'I.16', 'I.15', 'I.12A'],
+            ['I.08', 'I.09', 'I.10', 'I.11', 'I.12']
+        ];
+
+        // Mocks Database
+        let currentUnits = [];
+        let auctionUnits = [];
+
+        // --- INIT & RENDER ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderConsultants();
+            generateFloorData(15); // Default floor
+            
+            document.getElementById('floorSelect').addEventListener('change', (e) => {
+                const floor = e.target.value;
+                document.getElementById('currentFloorDisplay').innerText = `Tầng ${floor}`;
+                generateFloorData(floor);
+            });
+        });
+
+        function renderConsultants() {
+            const container = document.getElementById('consultantList');
+            let html = '';
+            consultants.forEach((c, index) => {
+                html += `
+                <label class="radio-custom cursor-pointer text-center relative group">
+                    <input type="radio" name="consultant" value="${c.name}" ${index === 0 ? 'required' : ''} class="absolute opacity-0">
+                    <div class="border border-white/10 rounded p-2 transition-all group-hover:border-gold/50 bg-black/40 h-full flex flex-col items-center">
+                        <img src="${c.img}" alt="${c.name}" class="w-10 h-10 rounded-full mb-2 object-cover border border-white/10">
+                        <span class="text-xs text-zinc-400 font-medium w-full truncate block">${c.name}</span>
+                    </div>
+                </label>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function generateFloorData(floorLevel) {
+            currentUnits = [];
+            const types = ['1PN', '1PN+', '2PN', '3PN'];
+            const statusKeys = Object.keys(statuses);
+
+            gridMap.forEach((row, rIdx) => {
+                row.forEach((cellId, cIdx) => {
+                    if (cellId !== 'empty') {
+                        // Random data generation
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        let area = 0;
+                        if(type === '1PN') area = 45;
+                        else if(type === '1PN+') area = 60;
+                        else if(type === '2PN') area = 80;
+                        else area = 110;
+                        
+                        // Weighted random status (make Unseen most common, sold less common for demo)
+                        const rand = Math.random();
+                        let status = 'unseen';
+                        if(rand > 0.9) status = 'sold';
+                        else if(rand > 0.8) status = 'resale';
+                        else if(rand > 0.7) status = 'deposited';
+                        else if(rand > 0.5) status = 'depositing';
+                        else if(rand > 0.3) status = 'viewing';
+
+                        currentUnits.push({
+                            id: cellId,
+                            name: `Căn ${cellId}`,
+                            floor: floorLevel,
+                            type: type,
+                            area: (area + Math.random()*5).toFixed(1),
+                            status: status,
+                            rIdx, cIdx
+                        });
+                    }
+                });
+            });
+
+            renderGrid();
+            generateAuctions();
+        }
+
+        function renderGrid() {
+            const gridEl = document.getElementById('floorGrid');
+            gridEl.innerHTML = '';
+
+            const rows = gridMap.length;
+            const cols = gridMap[0].length;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const unit = currentUnits.find(u => u.rIdx === r && u.cIdx === c);
+                    
+                    const cell = document.createElement('div');
+                    
+                    if (unit) {
+                        const st = statuses[unit.status];
+                        cell.className = `unit-cell ${st.color} ${st.text} ${st.border} ${st.shadow || ''}`;
+                        cell.innerHTML = `
+                            <span class="font-serif text-lg md:text-xl font-bold">${unit.id}</span>
+                            <span class="text-xs md:text-sm uppercase tracking-wider mt-1 md:mt-2 opacity-80">${unit.type}</span>
+                            <span class="text-[0.65rem] md:text-xs text-zinc-300 mt-1 opacity-60">${unit.area}m²</span>
+                        `;
+                        
+                        if (!st.disabled) {
+                            cell.onclick = () => openBookingModal(unit);
+                        } else {
+                            cell.style.cursor = 'not-allowed';
+                            cell.title = "Căn hộ đã bán";
+                        }
+                    } else {
+                        cell.className = 'unit-cell empty';
+                    }
+                    
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function generateAuctions() {
+            // Cố định 3 căn cho phiên đấu giá để dễ demo (trong đó có L.03)
+            const targetIds = ['L.08', 'L.03', 'I.12'];
+            auctionUnits = currentUnits.filter(u => targetIds.includes(u.id));
+            
+            // Nếu không đủ, lấy thêm ngẫu nhiên cho đủ 3
+            if(auctionUnits.length < 3) {
+                const others = currentUnits.filter(u => u.type === '3PN' && !targetIds.includes(u.id));
+                auctionUnits = [...auctionUnits, ...others.slice(0, 3 - auctionUnits.length)];
+            }
+            
+            // Generate Auction data
+            auctionUnits = auctionUnits.map((u, index) => {
+                let aucStatus = 'bidding';
+                if (index === 0) aucStatus = 'success'; // Đã chốt
+                else if (index === 1) aucStatus = 'upcoming'; // Sắp diễn ra
+                else aucStatus = 'bidding'; // Đang diễn ra
+
+                // Gán ảnh riêng cho L.03, các căn khác dùng mảng mặc định
+                let imgUrl = '';
+                if (u.id === 'L.03') {
+                    imgUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800'; // Ảnh riêng biệt cho L.03
+                } else {
+                    const auctionImages = [
+                        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&q=80&w=800',
+                        'https://images.unsplash.com/photo-1502672260266-1c1c29408447?auto=format&fit=crop&q=80&w=800',
+                        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800'
+                    ];
+                    imgUrl = auctionImages[index % 3];
+                }
+
+                return {
+                    ...u,
+                    img: imgUrl,
+                    basePrice: (parseFloat(u.area) * 120).toFixed(0), // approx 120 tr/m2
+                    estPrice: (parseFloat(u.area) * 140).toFixed(0),
+                    currentBid: (parseFloat(u.area) * (120 + Math.random()*15)).toFixed(0),
+                    status: aucStatus
+                };
+            });
+
+            renderAuctions();
+        }
+
+        function renderAuctions() {
+            const container = document.getElementById('auctionContainer');
+            container.innerHTML = '';
+
+            auctionUnits.forEach(auc => {
+                const isSuccess = auc.status === 'success';
+                const isUpcoming = auc.status === 'upcoming';
+                const isBidding = auc.status === 'bidding';
+
+                let badgeHtml = '';
+                if (isSuccess) badgeHtml = '<div class="absolute top-4 right-4 text-xs bg-gold text-dark px-2 py-1 font-bold rounded uppercase z-10 shadow-lg">Đã chốt</div>';
+                else if (isBidding) badgeHtml = '<div class="absolute top-4 right-4 flex items-center text-xs text-red-500 animate-pulse z-10 bg-black/50 px-2 py-1 font-bold rounded uppercase shadow-lg"><div class="w-2 h-2 bg-red-500 rounded-full mr-1"></div> Đang diễn ra</div>';
+                else if (isUpcoming) badgeHtml = '<div class="absolute top-4 right-4 text-xs bg-blue-500 text-white px-2 py-1 font-bold rounded uppercase z-10 shadow-lg">Sắp diễn ra</div>';
+
+                const cardClass = isSuccess 
+                    ? 'bg-darker border border-gold/30 relative overflow-hidden opacity-80 hover:opacity-100 transition-opacity' 
+                    : isUpcoming 
+                        ? 'bg-dark border border-blue-500/30 relative overflow-hidden'
+                        : 'bg-gradient-to-br from-darker to-[#1a150b] border border-gold auction-pulse relative overflow-hidden';
+                
+                let priceBlockHtml = '';
+                if (isUpcoming) {
+                    priceBlockHtml = `
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                            <span class="text-zinc-500">Giá khởi điểm dự kiến</span>
+                            <span class="text-white">${formatCurrency(auc.basePrice)} tỷ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                            <span class="text-zinc-500">Giá ước lượng</span>
+                            <span class="text-zinc-300">${formatCurrency(auc.estPrice)} tỷ</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-blue-500/10 p-3 rounded border border-blue-500/20">
+                            <span class="text-blue-400 text-sm uppercase tracking-widest font-medium">Mở bán</span>
+                            <span class="font-sans text-white font-medium">15/04/2026</span>
+                        </div>
+                    `;
+                } else {
+                    priceBlockHtml = `
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                            <span class="text-zinc-500">Giá khởi điểm</span>
+                            <span class="text-white">${formatCurrency(auc.basePrice)} tỷ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                            <span class="text-zinc-500">Giá ước lượng</span>
+                            <span class="text-zinc-300">${formatCurrency(auc.estPrice)} tỷ</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-black/40 p-3 rounded border ${isSuccess ? 'border-gold/50 shadow-[0_0_10px_rgba(197,160,89,0.2)]' : 'border-gold/10'}">
+                            <span class="text-gold text-sm uppercase tracking-widest font-medium">${isSuccess ? 'Chốt mua' : 'Đang trả giá'}</span>
+                            <span class="font-serif text-xl ${isSuccess ? 'text-white font-bold' : 'text-gradient-gold font-bold'}">${formatCurrency(auc.currentBid)} tỷ</span>
+                        </div>
+                    `;
+                }
+
+                let btnHtml = '';
+                if (isSuccess) {
+                    btnHtml = `<button class="w-full py-3 bg-white/5 text-zinc-500 cursor-not-allowed transition-colors text-sm uppercase font-medium tracking-widest" disabled>Đã kết thúc</button>`;
+                } else if (isUpcoming) {
+                    btnHtml = `<button onclick="alert('Đã đăng ký nhận thông báo cho ${auc.name}')" class="w-full py-3 bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition-colors text-sm uppercase font-medium tracking-widest">Nhận thông báo</button>`;
+                } else {
+                    btnHtml = `<button onclick="alert('Tính năng tham gia đấu giá cần xác thực tài khoản ngân hàng.')" class="w-full py-3 bg-gold text-dark hover:bg-goldHover transition-colors text-sm uppercase font-medium tracking-widest">Đặt giá ngay</button>`;
+                }
+
+                const html = `
+                <div class="${cardClass} p-6 rounded group flex flex-col justify-between h-full">
+                    <div>
+                        ${badgeHtml}
+                        <div class="overflow-hidden rounded mb-4 relative">
+                            <img src="${auc.img}" alt="${auc.name}" class="w-full h-48 object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-darker to-transparent pointer-events-none"></div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl text-white mb-1">${auc.name}</h3>
+                        <p class="text-sm text-zinc-400 mb-6">${auc.type} • ${auc.area}m² • Tầng ${auc.floor}</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            ${priceBlockHtml}
+                        </div>
+                    </div>
+                    ${btnHtml}
+                </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // --- UTILS & INTERACTIONS ---
+
+        function formatCurrency(numStr) {
+            return (parseFloat(numStr) / 1000).toFixed(2); // Giả lập tỷ VND
+        }
+
+        function openBookingModal(unit) {
+            // Update UI
+            document.getElementById('modalFloor').innerText = `Tầng ${unit.floor}`;
+            document.getElementById('modalUnitName').innerText = unit.name;
+            document.getElementById('modalType').innerText = unit.type;
+            document.getElementById('modalArea').innerText = `${unit.area} m²`;
+            document.getElementById('formUnitId').value = unit.id;
+            
+            // Update Image for L.03 specifically
+            const modalImage = document.getElementById('modalImage');
+            if(unit.id === 'L.03') {
+                modalImage.src = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800';
+            } else {
+                modalImage.src = 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80';
+            }
+            
+            const st = statuses[unit.status];
+            const badge = document.getElementById('modalStatusBadge');
+            badge.innerText = st.label;
+            badge.className = `px-3 py-1 text-xs font-medium rounded border ${st.color} ${st.border} ${unit.status === 'unseen' || unit.status === 'viewing' || unit.status === 'resale' ? 'text-white' : 'text-dark'}`;
+            
+            // Show modal
+            const modal = document.getElementById('bookingModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            if(modalId === 'successModal') {
+                // If closing success modal, also close booking modal and reset form
+                document.getElementById('bookingModal').classList.remove('active');
+                document.getElementById('bookingForm').reset();
+            }
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Đang xử lý...';
+            btn.disabled = true;
+
+            // Get selected consultant
+            const selectedConsultant = document.querySelector('input[name="consultant"]:checked');
+            const consultantName = selectedConsultant ? selectedConsultant.value : 'Chuyên viên';
+            const unitName = document.getElementById('modalUnitName').innerText;
+
+            // Update Success Modal Info
+            document.getElementById('successUnit').innerText = unitName;
+            document.getElementById('successConsultant').innerText = consultantName;
+            document.getElementById('bookingCode').innerText = `ROX-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            // Simulate API Call
+            setTimeout(() => {
+                btn.innerHTML = 'Xác nhận Đặt lịch';
+                btn.disabled = false;
+                
+                // Show success modal
+                document.getElementById('successModal').classList.add('active');
+                
+                // Change status of the unit in the grid to 'viewing' or 'depositing'
+                const unitId = document.getElementById('formUnitId').value;
+                const unit = currentUnits.find(u => u.id === unitId);
+                if(unit && unit.status === 'unseen') {
+                    unit.status = 'viewing';
+                    renderGrid(); // Re-render to show updated status
+                }
+                
+            }, 1000);
+        }
+    </script>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#020202] py-10 border-t border-white/5 relative overflow-hidden">
+        <div class="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center relative z-10">
+            <img src="./images/logo.png" alt="ROX" class="h-8 px-3 py-1.5 rounded">
+            <div class="flex space-x-6 text-xl text-zinc-500 mt-6 md:mt-0">
+                <a href="#" class="hover:text-gold transition-colors"><i class="ph ph-facebook-logo"></i></a>
+                <a href="#" class="hover:text-gold transition-colors"><i class="ph ph-instagram-logo"></i></a>
+            </div>
+        </div>
+        <p class="text-gray-600 text-xs mt-8 text-center">&copy; 2026 ROX Signature. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
