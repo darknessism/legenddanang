@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Đấu Giá | The Legend City Da Nang</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#C5A059',
+                        goldHover: '#dcb872',
+                        dark: '#0a0a0a',
+                        darker: '#050505',
+                        charcoal: '#1a1a1a',
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #C5A059, #F3E5AB, #C5A059);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 10px; }
+
+        .input-bespoke {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .input-bespoke:focus {
+            outline: none;
+            border-color: #C5A059;
+            background: rgba(197, 160, 89, 0.05);
+        }
+
+        /* Auction Pulse Effect */
+        .live-indicator {
+            position: relative;
+        }
+        .live-indicator::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            border: 2px solid #ef4444;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* History line */
+        .history-line::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -24px;
+            width: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        .history-item:last-child .history-line::before {
+            display: none;
+        }
+
+        /* Modal Transitions & Gallery */
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1000;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .modal.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+        
+        .gallery-img-wrapper {
+            overflow: hidden;
+            border-radius: 4px;
+            position: relative;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+        }
+        .gallery-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-cover: cover;
+            transition: transform 0.7s ease, filter 0.3s ease;
+            filter: brightness(0.8);
+        }
+        .gallery-img-wrapper:hover img {
+            transform: scale(1.05);
+            filter: brightness(1);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-gold selection:text-dark">
+
+    <!-- HEADER -->
+    <header class="fixed w-full top-0 z-50 bg-darker/95 backdrop-blur-md border-b border-white/10 py-4">
+        <div class="container mx-auto px-4 lg:px-8 flex justify-between items-center">
+            <a href="https://legenddanang.vercel.app/booking.html" class="flex items-center text-white hover:text-gold transition-colors text-sm font-medium tracking-widest uppercase">
+                <i class="ph ph-arrow-left mr-2 text-lg"></i> Booking
+            </a>
+            
+            <div class="text-sm text-white md:block">Phiên Đấu Giá #A-089</div>
+        </div>
+    </header>
+
+    <!-- HERO GALLERY -->
+    <section class="pt-20 bg-darker">
+        <div class="w-full h-[30vh] md:h-[45vh] relative group">
+            <img src="./images/ho-boi-vo-cuc.jpg" alt="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-darker via-darker/40 to-transparent"></div>
+            
+            <!-- Float Gallery Buttons -->
+            <div class="absolute bottom-6 right-6 flex gap-3">
+                <button onclick="openGallery()" class="bg-black/50 hover:bg-gold border border-white/20 hover:border-gold text-white hover:text-dark backdrop-blur px-4 py-2 flex items-center gap-2 transition-all text-sm font-medium">
+                    <i class="ph ph-image text-lg"></i> Gallery
+                </button>
+                <button onclick="openVideo()" class="bg-black/50 hover:bg-gold border border-white/20 hover:border-gold text-white hover:text-dark backdrop-blur px-4 py-2 flex items-center gap-2 transition-all text-sm font-medium">
+                    <i class="ph ph-play-circle text-lg"></i> Video Tour
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT GRID -->
+    <section class="py-12 bg-darker relative">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12">
+                
+                <!-- LEFT COLUMN: PROPERTY DETAILS -->
+                <div class="w-full lg:w-2/3">
+                    
+                    <!-- Title & Tags -->
+                    <div class="mb-8 border-b border-white/10 pb-8">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-gold/10 text-gold text-xs font-bold uppercase tracking-wider border border-gold/20">Sổ hồng lâu dài</span>
+                            <span class="px-2 py-1 bg-white/5 text-zinc-300 text-xs font-bold uppercase tracking-wider border border-white/10">Bàn giao Bespoke</span>
+                            <span class="px-2 py-1 bg-white/5 text-zinc-300 text-xs font-bold uppercase tracking-wider border border-white/10">Tầng 28</span>
+                        </div>
+                        <h1 class="font-serif text-4xl md:text-5xl text-gradient-gold font-bold mb-2 leading-tight">Penthouse Đế Vương </h1>
+                        <h1 class="font-serif text-4xl md:text-5xl italic text-zinc-400 font-regular mb-4 leading-tight">Tầm Nhìn Sông Hàn & Cầu Rồng </h1>
+                        <p class="text-zinc-400 flex items-center"><i class="ph ph-map-pin text-gold mr-2"></i> Tòa Tháp Căn Hộ VIP, The Legend City Da Nang, Việt Nam</p>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                        <div class="border-l border-gold pl-4">
+                            <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Loại Hình</p>
+                            <p class="text-lg font-medium text-white">Penthouse</p>
+                        </div>
+                        <div class="border-l border-gold pl-4">
+                            <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Diện tích</p>
+                            <p class="text-lg font-medium text-white">415.5 m²</p>
+                        </div>
+                        <div class="border-l border-gold pl-4">
+                            <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Phòng ngủ</p>
+                            <p class="text-lg font-medium text-white">4 Master</p>
+                        </div>
+                        <div class="border-l border-gold pl-4">
+                            <p class="text-xs text-zinc-500 uppercase tracking-widest mb-1">Hồ bơi</p>
+                            <p class="text-lg font-medium text-white">Bể vô cực riêng</p>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-12">
+                        <h3 class="font-serif text-2xl text-white mb-6">Tổng quan tuyệt tác</h3>
+                        <div class="space-y-4 text-zinc-300 font-light leading-relaxed text-sm md:text-base">
+                            <p>Được ví như "Viên kim cương trên vương miện", căn Penthouse tọa lạc tại tầng cao nhất của tháp The Legend City Da Nang mang đến trải nghiệm sống vượt xa mọi chuẩn mực thông thường. Sở hữu tầm nhìn panorama 360 độ ôm trọn dòng sông Hàn thơ mộng, biển Mỹ Khê và biểu tượng Cầu Rồng phô diễn vẻ đẹp lung linh về đêm.</p>
+                            <p>Không gian 415.5m² được thiết kế thông tầng ấn tượng với phòng khách có chiều cao trần lên tới 7m, kết hợp cùng kính Low-E chạm sàn mang ánh sáng tự nhiên và luồng sinh khí vào trọn vẹn mọi ngóc ngách.</p>
+                            <p>Căn hộ được bàn giao hoàn thiện với nội thất nhập khẩu nguyên chiếc từ Ý, khu vực bếp siêu sang trang bị thiết bị Gaggenau, và đặc biệt sở hữu một hồ bơi vô cực nước mặn tư gia ngay trên sân thượng.</p>
+                        </div>
+                    </div>
+
+                    <!-- Amenities Grid -->
+                    <div class="mb-12">
+                        <h3 class="font-serif text-2xl text-white mb-6">Đặc quyền cá nhân hóa</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex items-center bg-black/50 border border-white/5 p-4 rounded hover:border-gold/30 transition-colors">
+                                <i class="ph ph-elevator text-2xl text-gold mr-4"></i>
+                                <div>
+                                    <p class="text-white font-medium text-sm">Thang máy riêng biệt</p>
+                                    <p class="text-xs text-zinc-500">Mở cửa vào thẳng sảnh chính căn hộ</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-black/50 border border-white/5 p-4 rounded hover:border-gold/30 transition-colors">
+                                <i class="ph ph-car text-2xl text-gold mr-4"></i>
+                                <div>
+                                    <p class="text-white font-medium text-sm">03 Chỗ đỗ xe định danh</p>
+                                    <p class="text-xs text-zinc-500">Khu vực đỗ xe VIP dưới hầm</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-black/50 border border-white/5 p-4 rounded hover:border-gold/30 transition-colors">
+                                <i class="ph ph-swimming-pool text-2xl text-gold mr-4"></i>
+                                <div>
+                                    <p class="text-white font-medium text-sm">Hồ bơi tư gia & Vườn Nhật</p>
+                                    <p class="text-xs text-zinc-500">Thiết kế cảnh quan bởi Kengo Kuma</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-black/50 border border-white/5 p-4 rounded hover:border-gold/30 transition-colors">
+                                <i class="ph ph-wine text-2xl text-gold mr-4"></i>
+                                <div>
+                                    <p class="text-white font-medium text-sm">Hầm rượu xì gà riêng</p>
+                                    <p class="text-xs text-zinc-500">Phòng bảo quản nhiệt độ, độ ẩm tiêu chuẩn</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legal & Documents -->
+                    <div class="border-t border-white/10 pt-8 mb-12">
+                        <h3 class="font-serif text-2xl text-white mb-6">Hồ sơ pháp lý & Tài liệu</h3>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded flex justify-between items-center transition-colors group">
+                                <div class="text-left">
+                                    <p class="text-white font-medium text-sm mb-1">Tải Legal Pack (Hồ sơ pháp lý)</p>
+                                    <p class="text-xs text-zinc-500">Bản sao sổ đỏ, HĐMB mẫu (PDF, 4.2MB)</p>
+                                </div>
+                                <i class="ph ph-download-simple text-xl text-zinc-400 group-hover:text-gold"></i>
+                            </button>
+                            <button class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded flex justify-between items-center transition-colors group">
+                                <div class="text-left">
+                                    <p class="text-white font-medium text-sm mb-1">Bản vẽ mặt bằng chi tiết</p>
+                                    <p class="text-xs text-zinc-500">Bản vẽ kỹ thuật, AutoCad (ZIP, 12MB)</p>
+                                </div>
+                                <i class="ph ph-download-simple text-xl text-zinc-400 group-hover:text-gold"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: AUCTION PANEL (STICKY) -->
+                <div class="w-full lg:w-1/3">
+                    <div class="sticky top-24 space-y-6">
+                        
+                        <!-- MAIN AUCTION CARD -->
+                        <div class="bg-[#0a0805] border border-gold/40 rounded-lg p-6 relative overflow-hidden shadow-[0_0_30px_rgba(197,160,89,0.1)]">
+                            <!-- Background accent -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl"></div>
+
+                            <!-- Live Badge -->
+                            <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                                <div class="flex items-center bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-sm">
+                                    <div class="live-indicator w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                                    <span class="text-red-500 text-xs font-bold uppercase tracking-widest">LIVE</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-zinc-500 uppercase tracking-wider mb-1">Thời gian còn lại</p>
+                                    <p class="text-white font-mono text-lg font-medium" id="countdown">04:12:35</p>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Info -->
+                            <div class="mb-6 space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-zinc-400">Giá khởi điểm</span>
+                                    <span class="text-white font-medium">85.00 Tỷ VNĐ</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-zinc-400">Giá ước lượng</span>
+                                    <span class="text-white font-medium">120 - 150 Tỷ VNĐ</span>
+                                </div>
+                                <div class="bg-gradient-to-r from-gold/20 to-transparent p-4 rounded border-l-2 border-gold mt-2">
+                                    <p class="text-xs text-gold uppercase tracking-widest font-bold mb-1">Giá hiện tại cao nhất</p>
+                                    <p class="font-serif text-4xl text-gradient-gold font-bold">145.50 Tỷ</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Form -->
+                            <div class="mb-4">
+                                <label class="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Mức giá đề xuất của bạn (Tỷ VNĐ)</label>
+                                <div class="flex gap-2">
+                                    <input type="number" step="0.5" min="146.00" value="146.00" class="input-bespoke rounded text-lg font-medium text-white text-center">
+                                </div>
+                                <p class="text-xs text-zinc-500 mt-2 italic">* Bước giá tối thiểu: 0.5 Tỷ VNĐ</p>
+                            </div>
+                            
+                            <button onclick="alert('Hệ thống yêu cầu xác minh thẻ tín dụng đen (Black Card) hoặc ký quỹ 5 Tỷ VNĐ để tham gia đặt giá.')" class="w-full py-4 bg-gold text-dark hover:bg-goldHover transition-colors text-sm uppercase font-bold tracking-widest rounded-sm mb-3 shadow-[0_4px_14px_rgba(197,160,89,0.3)]">
+                                Xác nhận Đặt Giá
+                            </button>
+                            
+                            <p class="text-[0.65rem] text-zinc-500 text-center leading-relaxed">
+                                Bằng cách đặt giá, Quý khách đồng ý với <a href="#" class="text-gold underline">Điều khoản & Thể lệ Đấu giá</a> của ROX Signature. Yêu cầu ký quỹ 5% trước khi thầu.
+                            </p>
+                        </div>
+
+                        <!-- AUCTION HISTORY -->
+                        <div class="bg-darker border border-white/5 rounded-lg p-6">
+                            <h3 class="font-serif text-xl text-white mb-6 flex items-center justify-between">
+                                Lịch sử đặt giá <span class="text-xs font-sans text-gold bg-gold/10 px-2 py-1 rounded">12 Lượt</span>
+                            </h3>
+                            
+                            <div class="space-y-0 relative">
+                                <!-- History Item 1 -->
+                                <div class="history-item relative pl-8 pb-6">
+                                    <div class="history-line"></div>
+                                    <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-gold/20 border border-gold flex items-center justify-center z-10">
+                                        <div class="w-2 h-2 bg-gold rounded-full"></div>
+                                    </div>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-white text-sm font-medium">Bidder #8921</p>
+                                            <p class="text-xs text-zinc-500 mt-1">14:22 - Hôm nay</p>
+                                        </div>
+                                        <p class="text-gold font-bold font-serif text-lg">145.50 Tỷ</p>
+                                    </div>
+                                </div>
+                                <!-- History Item 2 -->
+                                <div class="history-item relative pl-8 pb-6">
+                                    <div class="history-line"></div>
+                                    <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white/5 border border-white/20 flex items-center justify-center z-10">
+                                        <div class="w-2 h-2 bg-zinc-500 rounded-full"></div>
+                                    </div>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-zinc-300 text-sm font-medium">Bidder #4412</p>
+                                            <p class="text-xs text-zinc-500 mt-1">10:15 - Hôm nay</p>
+                                        </div>
+                                        <p class="text-zinc-300 font-medium font-serif text-lg">145.00 Tỷ</p>
+                                    </div>
+                                </div>
+                                <!-- History Item 3 -->
+                                <div class="history-item relative pl-8 pb-6">
+                                    <div class="history-line"></div>
+                                    <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white/5 border border-white/20 flex items-center justify-center z-10">
+                                        <div class="w-2 h-2 bg-zinc-500 rounded-full"></div>
+                                    </div>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-zinc-300 text-sm font-medium">Bidder #1092</p>
+                                            <p class="text-xs text-zinc-500 mt-1">09:40 - Hôm nay</p>
+                                        </div>
+                                        <p class="text-zinc-300 font-medium font-serif text-lg">142.50 Tỷ</p>
+                                    </div>
+                                </div>
+                                <!-- History Item 4 -->
+                                <div class="history-item relative pl-8 pb-2">
+                                    <div class="history-line"></div>
+                                    <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white/5 border border-white/20 flex items-center justify-center z-10">
+                                        <div class="w-2 h-2 bg-zinc-500 rounded-full"></div>
+                                    </div>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-zinc-300 text-sm font-medium">Bidder #8921</p>
+                                            <p class="text-xs text-zinc-500 mt-1">21:05 - Hôm qua</p>
+                                        </div>
+                                        <p class="text-zinc-300 font-medium font-serif text-lg">140.00 Tỷ</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-4 py-2 border border-white/10 text-xs text-zinc-400 hover:text-white hover:border-white/30 transition-colors uppercase tracking-widest rounded">
+                                Xem toàn bộ lịch sử
+                            </button>
+                        </div>
+
+                        <!-- PRIVATE CONSULTANT CARD -->
+                        <div class="bg-darker border border-white/5 p-6 rounded-lg flex items-center gap-4 group cursor-pointer hover:border-gold/30 transition-colors">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80" alt="" class="w-16 h-16 rounded-full object-cover border border-gold/50">
+                            <div>
+                                <p class="text-xs text-gold uppercase tracking-widest mb-1">Chuyên viên tư vấn VIP</p>
+                                <p class="text-white font-medium mb-1">Trần Vy (Ms.)</p>
+                                <p class="text-xs text-zinc-500 flex items-center gap-2 group-hover:text-white transition-colors">
+                                    <i class="ph ph-phone text-gold"></i> Yêu cầu gọi lại
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TERMS & CONDITIONS (Điều khoản đấu giá) -->
+    <section class="bg-darker border-t border-white/5 pt-16 pb-8">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="max-w-6xl mx-auto space-y-10 text-xs text-zinc-400 font-light leading-relaxed text-justify">
+                
+                <div>
+                    <h4 class="text-gold font-medium uppercase tracking-widest text-sm mb-4">† Đấu giá có điều kiện</h4>
+                    <p class="mb-3">Nếu mức giá sàn được đáp ứng hoặc vượt qua và đồng hồ đếm ngược đấu giá về mức không, thời hạn độc quyền đối với bất động sản đó sẽ bắt đầu. Người trả giá thành công có nghĩa vụ theo hợp đồng phải thực hiện trao đổi (ký kết hợp đồng mua bán) bất động sản vào hoặc trước khi hết hạn 20 ngày làm việc kể từ khi kết thúc cuộc đấu giá (trừ khi có quy định khác trong phần "Thông tin quan trọng khác" của tin đăng).</p>
+                    <p class="mb-3">Tất cả các bất động sản được bán theo hình thức đấu giá có điều kiện đều phải chịu phí giữ chỗ, khoản phí này được nêu rõ trong các điều khoản và điều kiện đính kèm với bất động sản và trong hộp đấu giá trước khi đặt giá. Phí giữ chỗ được thanh toán bổ sung vào giá mua cuối cùng và là khoản phí không hoàn lại, tùy thuộc vào các điều khoản của Thỏa thuận Giữ chỗ.</p>
+                    <p class="mb-5">Để đảm bảo người trả giá thành công tiến hành giao dịch, người mua chiến thắng sẽ tự động bị tính phí giữ chỗ và đồng ý (trước khi đặt giá) thanh toán mọi khoản phí giữ chỗ bất động sản còn thiếu ngay khi kết thúc cuộc đấu giá. ROX Signature sẽ được ủy quyền thay mặt cả người mua và người bán ký thỏa thuận giữ chỗ.</p>
+                    
+                    <ul class="space-y-3 pl-4 border-l border-white/10 mb-5">
+                        <li><strong class="text-zinc-300 font-medium">Trường hợp hoàn phí:</strong> Nếu do lỗi từ phía người bán mà việc trao đổi hợp đồng không diễn ra vào hoặc trước khi hết hạn 20 ngày làm việc kể từ khi kết thúc đấu giá, phí giữ chỗ sẽ được hoàn lại đầy đủ cho người mua.</li>
+                        <li><strong class="text-zinc-300 font-medium">Trường hợp mất phí:</strong> Nếu người mua không thực hiện trao đổi hợp đồng vào hoặc trước khi hết hạn 20 ngày làm việc, họ sẽ mất toàn bộ số tiền phí giữ chỗ.</li>
+                    </ul>
+                    
+                    <p>Các khoản phí trả cho ROX Signature có thể được xem là một phần của giá trị tính thuế đối với bất động sản và được đưa vào tính toán nghĩa vụ thuế trước bạ. Bạn cần tham khảo thêm ý kiến từ đại diện pháp lý về vấn đề này.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-gold font-medium uppercase tracking-widest text-sm mb-4">* Thông tin về giá</h4>
+                    <p class="mb-3">Mức Giá Hướng dẫn (Guide Price) được chỉ định là mức kỳ vọng tối thiểu của mỗi người bán. Đây không nhất thiết là mức giá mà bất động sản sẽ được bán. Mỗi bất động sản sẽ được chào bán dựa trên mức Giá sàn (Reserve Price) – mức giá mà dưới đó bất động sản sẽ không được bán – chúng tôi dự kiến mức này sẽ không cao hơn quá 10% so với Giá Hướng dẫn.</p>
+                    <p class="mb-3">ROX Signature không chịu trách nhiệm về bất kỳ sai sót nào trong các khoản phí được nêu trên trang mô tả này, trong cửa sổ xác nhận đặt giá hoặc trong các thông tin chi tiết khác. Người mua nên kiểm tra nội dung của hồ sơ pháp lý và các điều kiện đặc biệt để biết thông tin chính xác về các loại phí. Trong trường hợp có mâu thuẫn giữa các khoản phí được nêu trong thông tin chi tiết và nội dung trong hồ sơ pháp lý, nội dung của hồ sơ pháp lý sẽ được ưu tiên áp dụng.</p>
+                    <p>Thuế Đất đai (Stamp Duty Land Tax) hoặc Thuế Giao dịch Đất đai và Tòa nhà cũng có thể được áp dụng trong một số trường hợp.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8 border-t border-white/5">
+                    <div>
+                        <h4 class="text-gold font-medium uppercase tracking-widest text-sm mb-4">Làm mới trang</h4>
+                        <p>Để đảm bảo bạn đang xem thông tin mới nhất về bất động sản, chúng tôi khuyên bạn nên làm mới (refresh) trang web. Điều này đảm bảo bạn đang thấy dữ liệu trực tiếp chứ không phải dữ liệu được lưu trữ (cached). Nếu trang bị mất kết nối Internet, việc làm mới trang sẽ hiển thị thông tin cập nhật nhất.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-gold font-medium uppercase tracking-widest text-sm mb-4">Tuyên bố miễn trừ trách nhiệm</h4>
+                        <p>Mọi thông tin liên quan đến bất động sản này, bao gồm mô tả, hình ảnh và các thông tin liên quan khác, đều do ROX Signature cung cấp. Tất cả các văn bản pháp lý liên quan đến bất động sản này đã được cung cấp bởi luật sư của Người bán. Cả ROX Signature và bất kỳ cá nhân nào đang làm việc tại ROX Signature đều không đưa ra bất kỳ bảo đảm nào về tính chính xác hoặc đầy đủ của bất kỳ thông tin bất động sản nào. Các thông tin chi tiết này không cấu thành một phần của bất kỳ hợp đồng hoặc đề nghị nào. Người mua không nên tin tưởng vào chúng như các tuyên bố đại diện mà nên kiểm tra xem thông tin có chính xác hay không thông qua việc kiểm tra thực tế hoặc các hình thức khác. Trường hợp có mâu thuẫn giữa nội dung của các văn bản pháp lý và các thông tin chi tiết này, thông tin trong văn bản pháp lý sẽ được ưu tiên áp dụng.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-darker border-t border-white/5 py-8">
+        <div class="container mx-auto px-4 lg:px-8 text-center">
+            <div class="font-serif text-xl tracking-wider text-gradient-gold mb-4">THE LEGEND CITY DA NANG</div>
+            <p class="text-xs text-zinc-500 mb-6">Được phát triển bởi ROX Signature & Vận hành bởi Accor Hotels</p>
+            <div class="flex justify-center gap-6 text-sm text-zinc-400">
+                <a href="#" class="hover:text-gold transition-colors">Điều khoản đấu giá</a>
+                <a href="#" class="hover:text-gold transition-colors">Chính sách bảo mật</a>
+                <a href="#" class="hover:text-gold transition-colors">Liên hệ</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: IMAGE GALLERY -->
+    <div id="galleryModal" class="modal fixed inset-0 flex items-center justify-center bg-black/95 backdrop-blur-md px-4 py-10">
+        <!-- Nút Đóng -->
+        <button onclick="closeGallery()" class="absolute top-6 right-6 text-zinc-400 hover:text-gold transition-colors z-[110] bg-dark p-3 rounded-full border border-white/10">
+            <i class="ph ph-x text-2xl"></i>
+        </button>
+        
+        <div class="modal-content w-full max-w-7xl h-full overflow-y-auto pr-2 custom-scrollbar">
+            <div class="text-center mb-10 mt-6">
+                <h2 class="font-serif text-3xl md:text-4xl text-white">Thư Viện Hình Ảnh</h2>
+                <p class="text-zinc-400 text-sm md:text-base mt-2">Penthouse Đế Vương • 24 Hình ảnh không gian thực tế</p>
+                <div class="w-16 h-px bg-gold mx-auto mt-4"></div>
+            </div>
+            
+            <!-- Grid Layout Ảnh -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Phòng khách"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80" alt="Tổng quan"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600566753086-00f18efc2291?auto=format&fit=crop&w=800&q=80" alt="Bếp"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Phòng ngủ Master"></div>
+                <div class="gallery-img-wrapper lg:col-span-2 aspect-video"><img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1600&q=80" alt="Ban công View biển" class="object-cover w-full h-full"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Phòng tắm"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1536882240095-0379873feb4e?auto=format&fit=crop&w=800&q=80" alt="Hồ bơi tư gia"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1556912172-45b7ee889ecb?auto=format&fit=crop&w=800&q=80" alt="Phòng ăn"></div>
+                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=800&q=80" alt="Sảnh hành lang"></div>
+                <div class="gallery-img-wrapper lg:col-span-2 aspect-video"><img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80" alt="Không gian thư giãn" class="object-cover w-full h-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VIDEO TOUR -->
+    <div id="videoModal" class="modal fixed inset-0 flex items-center justify-center bg-black/95 backdrop-blur-md px-4">
+        <!-- Nút Đóng -->
+        <button onclick="closeVideo()" class="absolute top-6 right-6 text-zinc-400 hover:text-gold transition-colors z-[110] bg-dark p-3 rounded-full border border-white/10">
+            <i class="ph ph-x text-2xl"></i>
+        </button>
+        
+        <div class="modal-content w-full max-w-6xl aspect-video bg-black rounded-lg overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+            <!-- Sử dụng video kiến trúc nội thất mẫu chất lượng cao (Pixabay free stock) -->
+            <video id="propertyVideo" class="w-full h-full object-cover" controls>
+                <source src="https://cdn.pixabay.com/video/2020/05/26/40224-425253503_large.mp4" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ thẻ video.
+            </video>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Các hàm xử lý pop-up Modal
+        function openGallery() {
+            document.getElementById('galleryModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; // Ngăn cuộn trang nền
+        }
+
+        function closeGallery() {
+            document.getElementById('galleryModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openVideo() {
+            document.getElementById('videoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Tự động phát video
+            const vid = document.getElementById('propertyVideo');
+            if(vid) vid.play();
+        }
+
+        function closeVideo() {
+            document.getElementById('videoModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // Tạm dừng video khi đóng popup
+            const vid = document.getElementById('propertyVideo');
+            if(vid) vid.pause();
+        }
+
+        // Fake Countdown logic
+        function startTimer(duration, display) {
+            let timer = duration, hours, minutes, seconds;
+            setInterval(function () {
+                hours = parseInt(timer / 3600, 10);
+                minutes = parseInt((timer % 3600) / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = hours + ":" + minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = 0; // stop at 0
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            // 4 hours, 12 minutes, 35 seconds in seconds = 15155
+            let fourHours = 15155,
+                display = document.querySelector('#countdown');
+            startTimer(fourHours, display);
+        };
+    </script>
+</body>
+</html>
