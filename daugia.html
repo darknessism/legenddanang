@@ -147,16 +147,24 @@
 </head>
 <body class="font-sans antialiased selection:bg-gold selection:text-dark">
 
-    <!-- HEADER (Minimal for Booking Page) -->
     <header class="fixed w-full top-0 z-50 bg-darker/95 backdrop-blur-md border-b border-white/10 py-4">
-        <div class="container mx-auto px-4 lg:px-8 flex justify-between items-center">
+    <div class="container mx-auto px-4 lg:px-8 flex justify-between items-center relative">
+        
+        <div class="w-1/3 flex justify-start">
             <a href="https://legenddanang.vercel.app/booking.html" class="flex items-center text-white hover:text-gold transition-colors text-sm font-medium tracking-widest">
-                <i class="ph ph-arrow-left mr-2 text-white"></i>
-            </a>
-            
-            <div class="text-sm text-white">Phiên đấu giá #A-086</div>
+                <i class="ph ph-arrow-left mr-2 text-xl"></i> </a>
         </div>
-    </header>
+        
+        <div class="w-1/3 flex justify-center">
+            <img src="./images/logo.png" alt="ROX" class="h-12 px-3 py-1.5 rounded object-contain">
+        </div>
+        
+        <div class="w-1/3 flex justify-end text-right">
+            <div class="text-sm text-white font-medium">Phiên đấu giá #A-086</div>
+        </div>
+        
+    </div>
+</header>
 
     <!-- HERO GALLERY -->
     <section class="pt-0 bg-darker">
@@ -165,7 +173,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-darker via-darker/40 to-transparent"></div>
             
             <!-- Float Gallery Buttons -->
-            <div class="absolute bottom-6 right-6 flex gap-3">
+            <div class="absolute bottom-6 left-14 flex gap-5">
                 <button onclick="openGallery()" class="bg-black/50 hover:bg-gold border border-white/20 hover:border-gold text-white hover:text-dark backdrop-blur px-4 py-2 flex items-center gap-2 transition-all text-sm font-medium">
                     <i class="ph ph-image text-lg"></i> Gallery
                 </button>
@@ -470,29 +478,27 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-darker border-t border-white/5 py-8">
-        <div class="container mx-auto px-4 lg:px-8 text-center">
-            <div class="font-serif text-xl tracking-wider text-gradient-gold mb-4">THE LEGEND CITY DA NANG</div>
-            <p class="text-xs text-zinc-500 mb-6">Được phát triển bởi ROX Signature & Vận hành bởi Accor Hotels</p>
-            <div class="flex justify-center gap-6 text-sm text-zinc-400">
-                <a href="#" class="hover:text-gold transition-colors">Điều khoản đấu giá</a>
-                <a href="#" class="hover:text-gold transition-colors">Chính sách bảo mật</a>
-                <a href="#" class="hover:text-gold transition-colors">Liên hệ</a>
+    <footer class="bg-[#020202] py-10 border-t border-white/5 relative overflow-hidden">
+        <div class="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center relative z-10">
+            <img src="./images/logo.png" alt="ROX" class="h-8 px-3 py-1.5 rounded">
+            <div class="flex space-x-6 text-xl text-zinc-500 mt-6 md:mt-0">
+                <a href="#" class="hover:text-gold transition-colors"><i class="ph ph-facebook-logo"></i></a>
+                <a href="#" class="hover:text-gold transition-colors"><i class="ph ph-instagram-logo"></i></a>
             </div>
         </div>
+        <p class="text-gray-600 text-xs mt-8 text-center">&copy; 2026 ROX Signature. All Rights Reserved.</p>
     </footer>
 
     <!-- MODAL: IMAGE GALLERY -->
     <div id="galleryModal" class="modal fixed inset-0 flex items-center justify-center bg-black/95 backdrop-blur-md px-4 py-10">
-        <!-- Nút Đóng -->
         <button onclick="closeGallery()" class="absolute top-6 right-6 text-zinc-400 hover:text-gold transition-colors z-[110] bg-dark p-3 rounded-full border border-white/10">
             <i class="ph ph-x text-2xl"></i>
         </button>
         
         <div class="modal-content w-full max-w-7xl h-full overflow-y-auto pr-2 custom-scrollbar">
             <div class="text-center mb-10 mt-6">
-                <h2 class="font-serif text-3xl md:text-4xl text-white">Thư Viện Hình Ảnh</h2>
-                <p class="text-zinc-400 text-sm md:text-base mt-2">Penthouse Đế Vương • 24 Hình ảnh không gian thực tế</p>
+                <h2 class="font-serif text-3xl md:text-4xl text-white">Gallery</h2>
+                <p class="text-zinc-400 text-sm md:text-base mt-2">Penthouse Đế Vương • Hình ảnh không gian thực tế</p>
                 <div class="w-16 h-px bg-gold mx-auto mt-4"></div>
             </div>
             
@@ -500,33 +506,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Phòng khách"></div>
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80" alt="Tổng quan"></div>
-                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600566753086-00f18efc2291?auto=format&fit=crop&w=800&q=80" alt="Bếp"></div>
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Phòng ngủ Master"></div>
-                <div class="gallery-img-wrapper lg:col-span-2 aspect-video"><img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1600&q=80" alt="Ban công View biển" class="object-cover w-full h-full"></div>
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80" alt="Phòng tắm"></div>
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1536882240095-0379873feb4e?auto=format&fit=crop&w=800&q=80" alt="Hồ bơi tư gia"></div>
-                <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1556912172-45b7ee889ecb?auto=format&fit=crop&w=800&q=80" alt="Phòng ăn"></div>
                 <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=800&q=80" alt="Sảnh hành lang"></div>
-                <div class="gallery-img-wrapper lg:col-span-2 aspect-video"><img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80" alt="Không gian thư giãn" class="object-cover w-full h-full"></div>
             </div>
         </div>
     </div>
 
     <!-- MODAL: VIDEO TOUR -->
     <div id="videoModal" class="modal fixed inset-0 flex items-center justify-center bg-black/95 backdrop-blur-md px-4">
-        <!-- Nút Đóng -->
-        <button onclick="closeVideo()" class="absolute top-6 right-6 text-zinc-400 hover:text-gold transition-colors z-[110] bg-dark p-3 rounded-full border border-white/10">
-            <i class="ph ph-x text-2xl"></i>
-        </button>
-        
-        <div class="modal-content w-full max-w-6xl aspect-video bg-black rounded-lg overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
-            <!-- Sử dụng video kiến trúc nội thất mẫu chất lượng cao (Pixabay free stock) -->
-            <video id="propertyVideo" class="w-full h-full object-cover" controls>
-                <source src="https://cdn.pixabay.com/video/2020/05/26/40224-425253503_large.mp4" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ thẻ video.
-            </video>
-        </div>
+    <button onclick="closeVideo()" class="absolute top-6 right-6 text-zinc-400 hover:text-gold transition-colors z-[110] bg-dark p-3 rounded-full border border-white/10">
+        <i class="ph ph-x text-2xl"></i>
+    </button>
+    
+    <div class="modal-content w-full max-w-6xl aspect-video bg-black rounded-lg overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+        <iframe id="propertyVideo" src="https://drive.google.com/file/d/19v--yXIFhzhJcKk9oM40J4ltEPP47qTt/preview" class="w-full h-full border-none shadow-2xl" allow="autoplay; fullscreen"></iframe>
     </div>
+</div>
 
     <!-- Scripts -->
     <script>
