@@ -857,9 +857,8 @@
                 } else if (isUpcoming) {
                     btnHtml = `<button onclick="alert('Đã đăng ký nhận thông báo cho ${auc.name}')" class="w-full py-3 bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition-colors text-sm uppercase font-medium tracking-widest">Nhận thông báo</button>`;
                 } else {
-                    btnHtml = `<button onclick="alert('Tính năng tham gia đấu giá cần xác thực tài khoản ngân hàng.')" class="w-full py-3 bg-gold text-dark hover:bg-goldHover transition-colors text-sm uppercase font-medium tracking-widest">Đặt giá ngay</button>`;
+                    btnHtml = `<button onclick="window.location.href='https://legenddanang.vercel.app/daugia.html'" class="w-full py-3 bg-gold text-dark hover:bg-goldHover transition-colors text-sm uppercase font-medium tracking-widest">Đặt giá ngay</button>`;
                 }
-
                 const html = `
                 <div class="${cardClass} p-6 rounded group flex flex-col justify-between h-full">
                     <div>
